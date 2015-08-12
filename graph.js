@@ -101,8 +101,8 @@ function graph(context, width, height){
     //not memory efficient
     this.graph=function(func, domain, color){
         var x=[],y=[];
-        var pixels_per_step=1;
-        step=(pixels_per_step*(domain[1]-domain[0]))/this.pixels_per_x;
+        var pixels_per_step=2;
+        step=pixels_per_step/this.pixels_per_x;
         for (var i=domain[0]; i<=domain[1]; i+=step){
             x.push(i);
             y.push(func(i));
