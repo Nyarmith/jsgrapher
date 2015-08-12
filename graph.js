@@ -101,9 +101,9 @@ function graph(context, width, height){
     //not memory efficient
     this.graph=function(func, domain, color){
         var x=[],y=[];
-        var pixels_per_step=3;
-        step=pixels_per_step*(domain[1]-domain[0])/this.pixels_per_x;
-        for (var i=domain[0]+step; i<domain[1]; i+=step){
+        var pixels_per_step=1;
+        step=(pixels_per_step*(domain[1]-domain[0]))/this.pixels_per_x;
+        for (var i=domain[0]; i<=domain[1]; i+=step){
             x.push(i);
             y.push(func(i));
         }
@@ -116,8 +116,9 @@ window.onload = function(){
     canvas=document.getElementById("my_canvas");
     context=canvas.getContext("2d");
     var mygraph = new graph(context, canvas.width, canvas.height);
-    mygraph.setBoundaries([-3,2],[-4,4]);
+    mygraph.setBoundaries([-3,2],[-4,2]);
     mygraph.lspline([-1,1,2,3,4],[2,1,3,-2,4],"red");
-    mygraph.graph(function(x){ return x*x; }, [-2,2]);
+    mygraph.graph(function(x){ return x*x; }, [-2,1]);
 }
 
+//TODO: Fix loss-of-precision error with sampling function perhaps by controlling intervals better, make zoom in&out feature, make simple separate GUI module for function input & buttons, add functions-as-entities OO hierarchy and options for each entity so you can change color, interval, etc...
