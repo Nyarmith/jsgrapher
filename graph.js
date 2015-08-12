@@ -3,6 +3,10 @@ function graph(context, width, height){
     this.width =width;
     this.height=height;
     this.context=context;
+    this.x_direction=0; //Direction of increasing/decreasing values
+    this.y_direction=0;
+    this.x_axis_loc=0;
+    this.y_axis_loc=0;
 
     //set boundaries, which also sets scale
     this.setBoundaries=function(x,y){
@@ -21,13 +25,15 @@ function graph(context, width, height){
         //axes drawing
         var x_axis_loc=0;
         var y_axis_loc=0;
-        
+
+        this.x_direction=1;
         //This will make y axis appear in middle of screen
         if (this.xBounds[0]<0 && this.xBounds[1]>0){
             y_axis_loc=Math.abs(this.xBounds[0])*this.pixels_per_x;
         }
         else if(this.xBounds[0]>0 && this.xBounds[1]<0){
             y_axis_loc=Math.abs(this.xBounds[1])*this.pixels_per_x;
+            this.x_direction=-1;//reverse direction
         }
         else if(this.xBounds[0]<=0 && this.xBounds[1]<=0){  //both intervals are above x
             y_axis_loc=width-1;
@@ -36,6 +42,7 @@ function graph(context, width, height){
             y_axis_loc=1;
         }
 
+        this.y_direction=1;
         //This will make x axis appear in middle of screen
         if (this.yBounds[0]<0 && this.yBounds[1]>0){
             //remember we draw from top left
@@ -43,6 +50,7 @@ function graph(context, width, height){
         }
         else if(this.xBounds[0]>0 && this.xBounds[1]<0){
             x_axis_loc=Math.abs(this.yBounds[0])*this.pixels_per_y;
+            this.y_direction=-1;
         }
         else if(this.yBounds[0]<=0 && this.yBounds[1]<=0){  //both intervals are above x
             x_axis_loc=1;
@@ -91,7 +99,7 @@ function graph(context, width, height){
         context.lineWidth=1;
         context.moveTo(x[0]*this.pixels_per_x,height-y[0]*this.pixels_per_y);
         for (var i=1; i<x.length;i++){
-            context.lineTo(x[i]*this.pixels_per_x,height-y[0]*this.pixels_per_y);
+            context.lineTo((this.x_direction*x[i]-this.xBounds[0])*this.pixels_per_x,height+(this.yBounds[0]+this.y_direction*y[i])*this.pixels_per_y);
         }
         context.stroke();
     }
