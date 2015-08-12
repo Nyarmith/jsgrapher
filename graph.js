@@ -1,48 +1,76 @@
 function graph(context, width, height){
     //pixel width and height
-    this.width = width;
+    this.width =width;
     this.height=height;
+    this.context=context;
 
     //set boundaries, which also sets scale
     this.setBoundaries=function(x,y){
-        this.pixels_per_x=width/(x[1]-x[0]);
-        this.pixels_per_y=height/(y[1]-y[0]);
+        this.pixels_per_x=width/Math.abs((x[1]-x[0]));
+        this.pixels_per_y=height/Math.abs((y[1]-y[0]));
         this.xBounds=x;
         this.yBounds=y;
+        this.drawGrid();
+        this.drawAxes();
     };
 
-    //set graph origin and width
     this.drawAxes=function(){
-        //Determine where we start drawing
-        startx=(((width/2)/this.pixels_per_x)%1)*this.pixels_per_x;
-        starty=(((height/2)/this.pixels_per_y)%1)*this.pixels_per_y;
-
-        //draw grid for unit scale
-        context.beginPath();
-        context.strokeStyle="gray";
-        context.lineWidth=1;
-        for(var i=startx; i < width; i+=pixels_per_x){
-            context.moveTo(i,0);
-            context.lineTo(i,height);
-            context.stroke();
-        }
-        for(var i=starty; i < width; i+=pixels_per_y){
-            context.moveTo(0,i);
-            context.lineTo(width,i);
-            context.stroke();
-        }
+        //There x and y both have two options for their direction and placement
+        //they should basically act as a reference point to where 0,0 axes are
+        //relative to our function grid
         //axes drawing
+        var x_axis_loc=0;
+        var y_axis_loc=0;
+        
+        //This will make y axis appear in middle of screen
+        if (this.xBounds[0]<0 && this.xBounds[1]>0){
+            //these middle draws will need to be changed if flipping is implemented
+            y_axis_loc=Math.abs(this.xBounds[0])*this.pixels_per_x;
+        }
+        else if(this.xBounds[0]<=0 && this.xBounds[1]<=0){  //both intervals are above x
+            y_axis_loc=width-1;
+        }
+        else{
+            y_axis_loc=1;
+        }
+
+        //This will make x axis appear in middle of screen
+        if (this.yBounds[0]<0 && this.yBounds[1]>0){
+            //remember we draw from top left
+            x_axis_loc=Math.abs(this.yBounds[1])*this.pixels_per_y;
+        }else if(this.yBounds[0]<=0 && this.yBounds[1]<=0){  //both intervals are above x
+            x_axis_loc=1;
+        }else{
+            x_axis_loc=height-1;
+        }
         context.beginPath();
         context.strokeStyle="black";
         context.lineWidth=2;
         //draw main X
-        context.moveTo(0,height/2);
-        context.lineTo(width, height/2);
+        context.moveTo(0,x_axis_loc);
+        context.lineTo(width, x_axis_loc);
         context.stroke();
         //draw main Y
-        context.moveTo(width/2,0);
-        context.lineTo(width/2,height);
+        context.moveTo(y_axis_loc,0);
+        context.lineTo(y_axis_loc,height);
         context.stroke();
+    }
+    //set graph origin and width
+    this.drawGrid=function(){
+        //draw grid for unit scale
+        context.beginPath();
+        context.strokeStyle="gray";
+        context.lineWidth=1;
+        for(var i=0; i <= width; i+=this.pixels_per_x){
+            context.moveTo(i,0);
+            context.lineTo(i,height);
+            context.stroke();
+        }
+        for(var i=0; i <= height; i+=this.pixels_per_y){
+            context.moveTo(0,i);
+            context.lineTo(width,i);
+            context.stroke();
+        }
     };
     //this.translate();
     /*
@@ -60,8 +88,7 @@ function graph(context, width, height){
 window.onload = function(){
     canvas=document.getElementById("my_canvas");
     context=canvas.getContext("2d");
-    var mygraph = new graph(context);
-    mygraph.setBoundaries([-4,4],[-4,4]);
-    mygraph.drawAxes(canvas.width, canvas.height, 14, 14);
+    var mygraph = new graph(context, canvas.width, canvas.height);
+    mygraph.setBoundaries([-2,-14],[-14,-1]);
     //mygraph.graph(function(x){ return x*x; }, [-2,2], "red");
 }
