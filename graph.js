@@ -24,8 +24,10 @@ function graph(context, width, height){
         
         //This will make y axis appear in middle of screen
         if (this.xBounds[0]<0 && this.xBounds[1]>0){
-            //these middle draws will need to be changed if flipping is implemented
             y_axis_loc=Math.abs(this.xBounds[0])*this.pixels_per_x;
+        }
+        else if(this.xBounds[0]>0 && this.xBounds[1]<0){
+            y_axis_loc=Math.abs(this.xBounds[1])*this.pixels_per_x;
         }
         else if(this.xBounds[0]<=0 && this.xBounds[1]<=0){  //both intervals are above x
             y_axis_loc=width-1;
@@ -38,9 +40,14 @@ function graph(context, width, height){
         if (this.yBounds[0]<0 && this.yBounds[1]>0){
             //remember we draw from top left
             x_axis_loc=Math.abs(this.yBounds[1])*this.pixels_per_y;
-        }else if(this.yBounds[0]<=0 && this.yBounds[1]<=0){  //both intervals are above x
+        }
+        else if(this.xBounds[0]>0 && this.xBounds[1]<0){
+            x_axis_loc=Math.abs(this.yBounds[0])*this.pixels_per_y;
+        }
+        else if(this.yBounds[0]<=0 && this.yBounds[1]<=0){  //both intervals are above x
             x_axis_loc=1;
-        }else{
+        }
+        else{
             x_axis_loc=height-1;
         }
         context.beginPath();
@@ -89,6 +96,6 @@ window.onload = function(){
     canvas=document.getElementById("my_canvas");
     context=canvas.getContext("2d");
     var mygraph = new graph(context, canvas.width, canvas.height);
-    mygraph.setBoundaries([-2,-14],[-14,-1]);
+    mygraph.setBoundaries([1,-4],[2,-4]);
     //mygraph.graph(function(x){ return x*x; }, [-2,2], "red");
 }
