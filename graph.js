@@ -79,6 +79,22 @@ function graph(context, width, height){
             context.stroke();
         }
     };
+    //interpolates x and y array, pre-condition:x.length==y.length
+    //TODO: Add discarding value for all out of bounds javascript more precise floatpoints, minus the first one, so our
+    //spline at least goes to the border of our graph
+    this.lspline=function(x,y,color){
+        context.beginPath();
+        if (typeof color == "undefined"){
+            color="blue";   //where our default graph color is set for now
+        }
+        context.strokeStyle=color;
+        context.lineWidth=1;
+        context.moveTo(x[0]*this.pixels_per_x,height-y[0]*this.pixels_per_y);
+        for (var i=1; i<x.length;i++){
+            context.lineTo(x[i]*this.pixels_per_x,height-y[0]*this.pixels_per_y);
+        }
+        context.stroke();
+    }
     //this.translate();
     /*
     this.graph=function(func, domain, color){
@@ -96,6 +112,7 @@ window.onload = function(){
     canvas=document.getElementById("my_canvas");
     context=canvas.getContext("2d");
     var mygraph = new graph(context, canvas.width, canvas.height);
-    mygraph.setBoundaries([1,-4],[2,-4]);
+    mygraph.setBoundaries([-1,4],[-4,4]);
+    mygraph.lspline([-1,1,2,3,4],[2,1,3,-2,4],"red");
     //mygraph.graph(function(x){ return x*x; }, [-2,2], "red");
 }
