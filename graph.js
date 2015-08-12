@@ -98,17 +98,17 @@ function graph(context, width, height){
         context.stroke();
     }
 
-    //this.translate();
-    /*
+    //not memory efficient
     this.graph=function(func, domain, color){
-        N=20;
-        step=(domain[1]-domain[0])/N;
-        context.moveTo(domain[0]+width/2,);
+        var x=[],y=[];
+        var pixels_per_step=3;
+        step=pixels_per_step*(domain[1]-domain[0])/this.pixels_per_x;
         for (var i=domain[0]+step; i<domain[1]; i+=step){
-           context.beginPath();
+            x.push(i);
+            y.push(func(i));
         }
+        this.lspline(x,y);
     }
-    */
 
 };
 
@@ -116,8 +116,8 @@ window.onload = function(){
     canvas=document.getElementById("my_canvas");
     context=canvas.getContext("2d");
     var mygraph = new graph(context, canvas.width, canvas.height);
-    mygraph.setBoundaries([4,-1],[-4,4]);
+    mygraph.setBoundaries([-3,2],[-4,4]);
     mygraph.lspline([-1,1,2,3,4],[2,1,3,-2,4],"red");
-    //mygraph.graph(function(x){ return x*x; }, [-2,2], "red");
+    mygraph.graph(function(x){ return x*x; }, [-2,2], "red");
 }
 
