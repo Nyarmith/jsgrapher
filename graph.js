@@ -107,7 +107,7 @@ function graph(context, width, height){
             x.push(i);
             y.push(func(i));
         }
-        this.lspline(x,y);
+        this.lspline(x,y,color);
     }
 
 };
@@ -118,6 +118,6 @@ window.onload = function(){
     var mygraph = new graph(context, canvas.width, canvas.height);
     mygraph.setBoundaries([-3,2],[-4,4]);
     mygraph.lspline([-1,1,2,3,4],[2,1,3,-2,4],"red");
-    mygraph.graph(function(x){ return x*x; }, [-2,2], "red");
+    mygraph.graph(function(x){ return x*x; }, [-2,2]);
 }
 
