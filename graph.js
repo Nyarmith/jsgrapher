@@ -1,3 +1,36 @@
+//Creating graphObject so we can re-render the same function by keeping it in memory
+function graphObjectProto(){                                                                   
+    this.setColor=function(x){
+        this.color=x;
+    }
+    this.getColor=function(){
+        return this.color;
+    }
+    this.getFunc=function(){
+        return (this.func);
+    }
+    this.setDomain=function(domain){
+        this.domain=domain;
+    }
+    this.getDomain=function(){
+        return this.domain;
+    }
+    this.setPts=function(x,y){
+        this.dataPts=[x,y];
+    }
+    this.getPts=function(){
+        return this.dataPts;
+    }
+}
+function graphObject(func, domain, color){
+    this.func=func;
+    this.domain=domain;
+    this.color=color;
+    this.dataPts=[];
+}
+graphObject.prototype=new graphObjectProto();
+
+//Graph object that maintains the graph state and operates canvas
 function graph(context, width, height){
     //pixel width and height
     this.width =width;
@@ -7,6 +40,7 @@ function graph(context, width, height){
     this.y_direction=0;
     this.x_axis_loc=0;
     this.y_axis_loc=0;
+    this.entityList=[];
 
     //set boundaries, which also sets scale
     this.setBoundaries=function(x,y){
@@ -108,8 +142,17 @@ function graph(context, width, height){
             y.push(func(i));
         }
         this.lspline(x,y,color);
+        var new_graph=new graphObject(func, domain, color);
+        new_graph.setPts(x,y);
+        this.entityList.push(new_graph);
     }
 
+    this.zoomOut(){
+    }
+
+    //zooming in requires recalculation of points to avoid precision loss, only within the viewed interval
+    this.zoomIn(){
+    }
 };
 
 window.onload = function(){
@@ -121,4 +164,4 @@ window.onload = function(){
     mygraph.graph(function(x){ return x*x; }, [-2,1]);
 }
 
-//TODO: Fix loss-of-precision error with sampling function perhaps by controlling intervals better, make zoom in&out feature, make simple separate GUI module for function input & buttons, add functions-as-entities OO hierarchy and options for each entity so you can change color, interval, etc...
+//TODO: make zoom in&out feature, make simple separate GUI module for function input & buttons, add functions-as-entities OO hierarchy and options for each entity so you can change color, interval, time as parameter, etc...
