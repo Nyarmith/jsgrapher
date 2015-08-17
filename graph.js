@@ -92,16 +92,23 @@ function graph(context, width, height){
     }
     //set graph origin and width
     this.drawGrid=function(){
+        //grid also needs to keep track of direcitonality
+        //if direction<0 startx=1-math.abs(bounds[0]%1); else startx=math.abs(bounds[0]%1)
+        var startx = Math.abs(this.xBounds[0]%1);
+        startx = this.x_direction<0 ? 1-startx : startx;
+
+        var starty = Math.abs(this.yBounds[1]%1);
+        starty = this.y_direction<0 ? 1-starty : starty;
         //draw grid for unit scale
         context.beginPath();
         context.strokeStyle="gray";
         context.lineWidth=1;
-        for(var i=0; i <= width; i+=this.pixels_per_x){
+        for(var i=startx*this.pixels_per_x; i <= width; i+=this.pixels_per_x){
             context.moveTo(i,0);
             context.lineTo(i,height);
             context.stroke();
         }
-        for(var i=0; i <= height; i+=this.pixels_per_y){
+        for(var i=starty*this.pixels_per_y; i <= height; i+=this.pixels_per_y){
             context.moveTo(0,i);
             context.lineTo(width,i);
             context.stroke();
@@ -162,11 +169,12 @@ function graph(context, width, height){
     
     this.scaleBounds=function(percent){
         this.clearScreen();
-        size=Math.abs(this.xBounds[0]-this.xBounds[1]);
-        size=Math.abs(this.yBounds[0]-this.yBounds[1]);
-        var inc=size*percent/2;
-        var new_x_bounds = [this.xBounds[0]-this.x_direction*inc,this.xBounds[1]+this.x_direction*inc];
-        var new_y_bounds = [this.yBounds[0]-this.y_direction*inc,this.yBounds[1]+this.y_direction*inc];
+        sizex=this.xBounds[0]-this.xBounds[1];
+        sizey=this.yBounds[0]-this.yBounds[1];
+        var incx=(sizex*percent-sizex)/2;
+        var incy=(sizey*percent-sizey)/2;
+        var new_x_bounds = [this.xBounds[0]-this.x_direction*incy,this.xBounds[1]+this.x_direction*incx];
+        var new_y_bounds = [this.yBounds[0]-this.y_direction*incx,this.yBounds[1]+this.y_direction*incy];
         //clear screen right before drawing operations
         this.clearScreen();
         this.setBoundaries(new_x_bounds,new_y_bounds);
@@ -200,7 +208,7 @@ window.onload = function(){
     canvas=document.getElementById("my_canvas");
     context=canvas.getContext("2d");
     mygraph = new graph(context, canvas.width, canvas.height);
-    mygraph.setBoundaries([-3,2],[-4,2]);
+    mygraph.setBoundaries([-3.2,2.2],[-4,2.2]);
     mygraph.lspline([-1,1,2,3,4],[2,1,3,-2,4],"red");
     mygraph.addGraph(function(x){ return x*x; }, [-2,1]);
 }
