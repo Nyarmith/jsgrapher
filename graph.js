@@ -132,8 +132,8 @@ function graph(context, width, height){
         context.stroke();
     }
 
-    //not memory efficient
-    this.graph=function(func, domain, color){
+    //Makes points in domain with specified pixels_per_step
+    this.makePoints=function(func,domain,pixels_per_step){
         var x=[],y=[];
         var pixels_per_step=2;
         step=pixels_per_step/this.pixels_per_x;
@@ -141,27 +141,68 @@ function graph(context, width, height){
             x.push(i);
             y.push(func(i));
         }
-        this.lspline(x,y,color);
+        return ([x,y]);
+    }
+
+    //not memory efficient
+    this.addGraph=function(func,domain,color){
+        var pts=this.makePoints(func,domain,2);   //2 pixels per step
+        this.lspline(pts[0],pts[1],color);
         var new_graph=new graphObject(func, domain, color);
-        new_graph.setPts(x,y);
+        new_graph.setPts(pts[0],pts[1]);
         this.entityList.push(new_graph);
     }
 
-    this.zoomOut(){
+    //not memory efficient, there's probably a better way to do this than by making
+    //a separate redraw function for graphobjects already in the entityList. perhaps an id test
+    this.regraph=function(func, domain, color){
+        var pts=this.makePoints(func,domain,2);   //2 pixels per step
+        this.lspline(pts[0],pts[1],color);
+    }
+    
+    this.scaleBounds=function(percent){
+        this.clearScreen();
+        size=Math.abs(this.xBounds[0]-this.xBounds[1]);
+        size=Math.abs(this.yBounds[0]-this.yBounds[1]);
+        var inc=size*percent/2;
+        var new_x_bounds = [this.xBounds[0]-this.x_direction*inc,this.xBounds[1]+this.x_direction*inc];
+        var new_y_bounds = [this.yBounds[0]-this.y_direction*inc,this.yBounds[1]+this.y_direction*inc];
+        //clear screen right before drawing operations
+        this.clearScreen();
+        this.setBoundaries(new_x_bounds,new_y_bounds);
+    }
+
+    this.zoomOut=function(percent){
+        this.scaleBounds(percent);
+        for (var i in this.entityList){
+            var color=this.entityList[i].getColor();
+            var pts=this.entityList[i].getPts();
+            this.lspline(pts[0],pts[1],color);
+        }
     }
 
     //zooming in requires recalculation of points to avoid precision loss, only within the viewed interval
-    this.zoomIn(){
+    this.zoomIn=function(percent){
+        this.scaleBounds(1+percent);
+        for (var i in this.entityList){
+            var color=this.entityList[i].getColor();
+            var domain=this.entityList[i].getDomain();
+            this.regraph(this.entityList[i].getFunc(),domain,color);
+        }
+    }
+
+    this.clearScreen=function(){
+        this.context.clearRect(0,0,this.width,this.height);
     }
 };
 
 window.onload = function(){
     canvas=document.getElementById("my_canvas");
     context=canvas.getContext("2d");
-    var mygraph = new graph(context, canvas.width, canvas.height);
+    mygraph = new graph(context, canvas.width, canvas.height);
     mygraph.setBoundaries([-3,2],[-4,2]);
     mygraph.lspline([-1,1,2,3,4],[2,1,3,-2,4],"red");
-    mygraph.graph(function(x){ return x*x; }, [-2,1]);
+    mygraph.addGraph(function(x){ return x*x; }, [-2,1]);
 }
 
 //TODO: make zoom in&out feature, make simple separate GUI module for function input & buttons, add functions-as-entities OO hierarchy and options for each entity so you can change color, interval, time as parameter, etc...
