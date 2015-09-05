@@ -22,6 +22,7 @@ function graphObjectProto(){
         return this.dataPts;
     }
 }
+
 function graphObject(func, domain, color){
     this.func=func;
     this.domain=domain;
@@ -50,7 +51,8 @@ function graph(context, width, height){
         this.y_direction=Math.abs((y[1]-y[0]))/(y[1]-y[0]);
         this.xBounds=x;
         this.yBounds=y;
-        this.x_axis_loc=-1*this.y_direction*y[0];
+        //this.x_axis_loc=this.y_direction*y[1];  //why
+        this.x_axis_loc=this.y_direction*y[1];  //why
         this.y_axis_loc=-1*this.x_direction*x[0];
         this.drawGrid();
         this.drawAxes();
@@ -90,6 +92,7 @@ function graph(context, width, height){
         context.lineTo(y_draw,height);
         context.stroke();
     }
+
     //set graph origin and width
     this.drawGrid=function(){
         //grid also needs to keep track of direcitonality
@@ -98,7 +101,7 @@ function graph(context, width, height){
         startx = this.x_direction<0 ? 1-startx : startx;
 
         var starty = Math.abs(this.yBounds[1]%1);
-        starty = this.y_direction<0 ? 1-starty : starty;
+        starty = this.y_direction>0 ? 1-starty : starty;    //IMPORTANT FIX CHANGE HERE
         //draw grid for unit scale
         context.beginPath();
         context.strokeStyle="gray";
@@ -114,7 +117,6 @@ function graph(context, width, height){
             context.stroke();
         }
     };
-
 
     this.transform=function(x,y){
         return [this.pixels_per_x*(this.y_axis_loc+this.x_direction*x), this.pixels_per_y*(this.x_axis_loc-this.y_direction*y)];
@@ -208,8 +210,8 @@ window.onload = function(){
     canvas=document.getElementById("my_canvas");
     context=canvas.getContext("2d");
     mygraph = new graph(context, canvas.width, canvas.height);
-    mygraph.setBoundaries([-3.2,2.2],[-4,2.2]);
-    mygraph.lspline([-1,1,2,3,4],[2,1,3,-2,4],"red");
+    mygraph.setBoundaries([-3.5,2.2],[-2.2,4.5]);   //1.8, -1.5 works, 2.2, -4.1 does not grid drawn wrong
+    mygraph.lspline([-1,1,2,3,4],[2,1,3,-2,5],"red");
     mygraph.addGraph(function(x){ return x*x; }, [-2,1]);
 }
 
