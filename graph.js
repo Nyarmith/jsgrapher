@@ -101,7 +101,7 @@ function graph(context, width, height){
         startx = this.x_direction<0 ? 1-startx : startx;
 
         var starty = Math.abs(this.yBounds[1]%1);
-        starty = this.y_direction>0 ? 1-starty : starty;    //IMPORTANT FIX CHANGE HERE
+        starty = this.y_direction>0 ? 1-starty : starty;
         //draw grid for unit scale
         context.beginPath();
         context.strokeStyle="gray";
@@ -171,10 +171,20 @@ function graph(context, width, height){
     
     this.scaleBounds=function(percent){
         this.clearScreen();
-        sizex=this.xBounds[0]-this.xBounds[1];
-        sizey=this.yBounds[0]-this.yBounds[1];
-        var incx=(sizex*percent-sizex)/2;
-        var incy=(sizey*percent-sizey)/2;
+        //sizex=Math.abs(this.xBounds[0]-this.xBounds[1]);
+        //sizey=Math.abs(this.yBounds[0]-this.yBounds[1]);
+        //var incx=(sizex*percent-sizex)/2;
+        //var incy=(sizey*percent-sizey)/2;
+        if (percent > 1)
+        {
+            incx=-1;
+            incy=-1;
+        }
+        else
+        {
+            incx=1;
+            incy=1;
+        }
         var new_x_bounds = [this.xBounds[0]-this.x_direction*incy,this.xBounds[1]+this.x_direction*incx];
         var new_y_bounds = [this.yBounds[0]-this.y_direction*incx,this.yBounds[1]+this.y_direction*incy];
         //clear screen right before drawing operations
@@ -210,7 +220,7 @@ window.onload = function(){
     canvas=document.getElementById("my_canvas");
     context=canvas.getContext("2d");
     mygraph = new graph(context, canvas.width, canvas.height);
-    mygraph.setBoundaries([-3.5,2.2],[-2.2,4.5]);   //1.8, -1.5 works, 2.2, -4.1 does not grid drawn wrong
+    mygraph.setBoundaries([-3.5,2.2],[1.8,-1.5]);   //1.8, -1.5 works, 2.2, -4.1 does not grid drawn wrong
     mygraph.lspline([-1,1,2,3,4],[2,1,3,-2,5],"red");
     mygraph.addGraph(function(x){ return x*x; }, [-2,1]);
 }
