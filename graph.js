@@ -216,6 +216,26 @@ function graph(context, width, height){
     }
 };
 
+function Randoms(){
+    //Generates a standard normal random variable unless mean and standard deviation is specified
+    this.normalRandom=function(mean, standard_deviation){
+        var u_1, u_2;
+        //DEFAULT PARAMS
+        if (typeof mean == "undefined")
+        {
+            mean=0;
+        }
+        if (typeof standard_deviation == "undefined")
+        {
+            standard_deviation=1;
+        }
+        u_1 = Math.random();
+        u_2 = Math.random();
+        //inverse of standard normal transformation
+        return standard_deviation*(Math.sqrt(-2*Math.log(u_1))*Math.sin(2*Math.PI*u_2))+mean;
+    };
+}
+
 window.onload = function(){
     canvas=document.getElementById("my_canvas");
     context=canvas.getContext("2d");
@@ -224,5 +244,6 @@ window.onload = function(){
     mygraph.lspline([-1,1,2,3,4],[2,1,3,-2,5],"red");
     mygraph.addGraph(function(x){ return x*x; }, [-2,1]);
 }
+
 
 //TODO: make zoom in&out feature, make simple separate GUI module for function input & buttons, add functions-as-entities OO hierarchy and options for each entity so you can change color, interval, time as parameter, etc...
