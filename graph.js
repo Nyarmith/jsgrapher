@@ -154,12 +154,26 @@ function graph(context, width, height){
     }
 
     //not memory efficient
-    this.addGraph=function(func,domain,color){
-        var pts=this.makePoints(func,domain,2);   //2 pixels per step
-        this.lspline(pts[0],pts[1],color);
-        var new_graph=new graphObject(func, domain, color);
-        new_graph.setPts(pts[0],pts[1]);
-        this.entityList.push(new_graph);
+    this.addGraph=function(func,domain,color, type){
+        if (typeof type == "undefined" || type == 0)    //function with bounds
+        {
+            var pts=this.makePoints(func,domain,2);   //2 pixels per step
+            this.lspline(pts[0],pts[1],color);
+            var new_graph=new graphObject(func, domain, color);
+            new_graph.setPts(pts[0],pts[1]);
+            this.entityList.push(new_graph);
+        }
+        else if (type == 1) //direct points
+        {
+            var new_graph=new graphObject(function(){
+            return 0}, [],color);
+            new_graph.setPts(func, domain);
+            this.entityList.push(new_graph);
+        }
+        else
+        {
+            alert("Error, invalid function type");
+        }
     }
 
     //not memory efficient, there's probably a better way to do this than by making
@@ -214,36 +228,17 @@ function graph(context, width, height){
     this.clearScreen=function(){
         this.context.clearRect(0,0,this.width,this.height);
     }
-};
 
-function Randoms(){
-    //Generates a standard normal random variable unless mean and standard deviation is specified
-    this.normalRandom=function(mean, standard_deviation){
-        var u_1, u_2;
-        //DEFAULT PARAMS
-        if (typeof mean == "undefined")
-        {
-            mean=0;
-        }
-        if (typeof standard_deviation == "undefined")
-        {
-            standard_deviation=1;
-        }
-        u_1 = Math.random();
-        u_2 = Math.random();
-        //inverse of standard normal transformation
-        return standard_deviation*(Math.sqrt(-2*Math.log(u_1))*Math.sin(2*Math.PI*u_2))+mean;
-    };
-}
+};
 
 window.onload = function(){
     canvas=document.getElementById("my_canvas");
     context=canvas.getContext("2d");
     mygraph = new graph(context, canvas.width, canvas.height);
     mygraph.setBoundaries([-3.5,2.2],[1.8,-1.5]);   //1.8, -1.5 works, 2.2, -4.1 does not grid drawn wrong
-    mygraph.lspline([-1,1,2,3,4],[2,1,3,-2,5],"red");
+    mygraph.addGraph([-1,1,2,3,4],[2,1,3,-2,5],"red",1);
     mygraph.addGraph(function(x){ return x*x; }, [-2,1]);
 }
 
-
 //TODO: make zoom in&out feature, make simple separate GUI module for function input & buttons, add functions-as-entities OO hierarchy and options for each entity so you can change color, interval, time as parameter, etc...
+
